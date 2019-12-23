@@ -1,0 +1,5 @@
+PublicKey = {PEER_PUBLIC_KEY}
+AllowedIPs = {SUBNET_IPADDRESS}/24
+#AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = {PEER_IPADDRESS}:35630
+PersistentKeepalive = 25

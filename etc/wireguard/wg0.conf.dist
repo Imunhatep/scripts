@@ -1,0 +1,17 @@
+[Interface]
+Address = {SERVER_IPADDRESS}/24
+SaveConfig = true
+
+PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = iptables -A FORWARD -o %i -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o {SERVER_IFACE} -j MASQUERADE
+
+PostDown = iptables -D FORWARD -i %i -j ACCEPT
+PostDown = iptables -D FORWARD -o %i -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o {SERVER_IFACE} -j MASQUERADE
+
+ListenPort = 51820
+PrivateKey = {SERVER_PRIVATE_KEY}
+
+[Peer]
+
