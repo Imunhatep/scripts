@@ -1,17 +1,44 @@
+
 [Interface]
-Address = {SERVER_IPADDRESS}/24
-SaveConfig = true
-
-PostUp = iptables -A FORWARD -i %i -j ACCEPT
-PostUp = iptables -A FORWARD -o %i -j ACCEPT
-PostUp = iptables -t nat -A POSTROUTING -o {SERVER_IFACE} -j MASQUERADE
-
-PostDown = iptables -D FORWARD -i %i -j ACCEPT
-PostDown = iptables -D FORWARD -o %i -j ACCEPT
-PostDown = iptables -t nat -D POSTROUTING -o {SERVER_IFACE} -j MASQUERADE
-
+# Name = gateway.example-vpn.dev
+# LAN = 172.16.0.5/24
+Address = 10.0.44.1/24
 ListenPort = 51820
-PrivateKey = {SERVER_PRIVATE_KEY}
+PrivateKey = privatekey
+DNS = 213.133.98.98, 213.133.99.99
+
+PostUp = sysctl -w net.ipv4.ip_forward=1
+PostUp = sysctl -w net.ipv6.conf.all.forwarding=1
+
+PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT
+
+PostUp   = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+#PostUp   = iptables -t nat -A POSTROUTING -o ens10 -j MASQUERADE
+#PostDown = iptables -t nat -D POSTROUTING -o ens10 -j MASQUERADE
 
 [Peer]
+# Name = node3.example-vpn.dev
+# LAN = 172.16.0.3/24
+Endpoint = 172.16.0.3:51820
+PublicKey = node3_pubkey
+AllowedIPs = 10.0.44.3/32
+PersistentKeepalive = 25
 
+[Peer]
+# Name = node1.example-vpn.dev
+# LAN = 172.16.0.4/24
+Endpoint = 172.16.0.4:51820
+PublicKey = node1_pubkey
+AllowedIPs = 10.0.44.4/32
+PersistentKeepalive = 25
+
+[Peer]
+# Name = node2.example-vpn.dev
+# LAN = 172.16.0.2/24
+Endpoint = 172.16.0.2:51820
+PublicKey = node2_pubkey
+AllowedIPs = 10.0.44.2/32
+PersistentKeepalive = 25
