@@ -1,0 +1,45 @@
+Port 22
+AcceptEnv LANG LC_*
+ChallengeResponseAuthentication no
+ClientAliveInterval 30
+ClientAliveCountMax 120
+DenyUsers test admin guest nobody www www-data nginx docker
+#DenyUsers root test admin guest nobody www www-data
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+IgnoreRhosts yes
+LoginGraceTime 2m
+LogLevel INFO
+MaxAuthTries 6
+MaxSessions 10
+PasswordAuthentication no
+PermitRootLogin without-password
+PermitTunnel yes
+PrintMotd no
+PubkeyAuthentication yes
+StrictModes yes
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+SyslogFacility AUTH
+UsePAM yes
+TCPKeepAlive yes
+X11Forwarding yes
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+#X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+#PrintLastLog yes
+#UseLogin no
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
