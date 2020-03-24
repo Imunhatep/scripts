@@ -1,0 +1,13 @@
+[Unit]
+Description=WireGuard via wireguard for %I
+After=network-online.target nss-lookup.target
+Wants=network-online.target nss-lookup.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/wireguard up %i
+ExecStop=/usr/bin/wireguard down %i
+
+[Install]
+WantedBy=multi-user.target
