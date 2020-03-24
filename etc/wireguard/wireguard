@@ -1,0 +1,73 @@
+#!/bin/bash
+
+set -e -o pipefail
+shopt -s extglob
+export LC_ALL=C
+
+NET_IFACE=eth0
+NET_ROUTER=172.31.1.1
+
+WG_ROUTER=10.0.44.1
+WG_ADDR=10.0.44.5
+
+DNS=("1.1.1.1" "8.8.8.8")
+
+cmd() {
+    echo "[#] $*" >&2
+    "$@"
+}
+
+case "$1" in
+up)
+    echo "Adding WG interface"
+    cmd ip link add dev $2 type wireguard
+
+    echo "$2 address: ${WG_ADDR}/24"
+    cmd ip address add dev $2 ${WG_ADDR}/24
+    cmd wg setconf $2 /etc/wireguard/$2.conf
+
+    echo "$2 interface UP"
+    cmd ip link set up dev $2
+
+    echo "Routing: remove default GW, add default via $2"
+    cmd ip r change default via $WG_ROUTER dev $2
+
+    echo "Routing: adding DNS via $NET_IFACE" 
+    for IP in ${DNS[@]}; do
+        cmd ip r add $IP via $NET_ROUTER dev $NET_IFACE
+    done
+    echo $!>/var/run/wireguard@$2.pid
+    ;;
+down)
+    echo "Routing: restore default GW"
+    cmd ip r change default via $NET_ROUTER dev $NET_IFACE
+
+    echo "Routing: remove DNS records"
+    for IP in ${DNS[@]}; do
+        cmd ip r del $IP
+    done
+
+    echo "Shutdown $2 interface"
+    cmd ip link set down dev $2
+
+    echo "Remove $2 interface"
+    cmd ip link del dev $2
+    rm /var/run/wireguard@$2.pid
+    ;;
+restart)
+   $0 stop
+   $0 start
+   ;;
+status)
+   if [ -e /var/run/wireguard@$2.pid ]; then
+      wg show
+   else
+      echo wireguard@$2 is NOT running
+      exit 1
+   fi
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status|restart}"
+esac
+
+exit 0
