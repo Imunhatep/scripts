@@ -48,7 +48,7 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: cheese
-  annotations: []
+  annotations: {}
     # kubernetes.io/ingress.class: traefik
     # kubernetes.io/ingress.class: nginx
     # cert-manager.io/cluster-issuer: letsencrypt-prod
